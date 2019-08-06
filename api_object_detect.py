@@ -84,17 +84,17 @@ class ApiObjectDetect(tornado.web.RequestHandler):
             # 图像目标检测
             #ret = darknet.detect(net, meta, str.encode(img_file))
             res = darknet.detect(img_file)
-            #print(ret)
-            if not res:
-                logging.error('execute fail [' + img_file + '] ')
-                return {'code': 4, 'msg': '查询失败'}
+            print(res)
+            #if not res:
+            #    logging.error('execute fail [' + img_file + '] ')
+            #    return {'code': 4, 'msg': 'detect fail'}
             # 数据格式化
             #for o in ret:
             #    res.append({'label': str(o[0], 'utf-8'), 'weight': o[1], 'rect': o[2]})
             #print(res)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
-            return {'code': 5, 'msg': '查询失败'}
+            return {'code': 5, 'msg': 'detect fail'}
 
         # 组织返回格式
         return {'code': 0, 'msg': 'success', 'data': res}
