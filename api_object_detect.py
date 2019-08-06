@@ -5,7 +5,7 @@ File: api_object_detect.py
 Desc: 图像目标识别 API 封装
 Demo: 
     nohup python api_object_detect.py > log/api_object_detect.log &
-    http://www.yanjingang.com:8025/piglab/image/object_detect?img_file=/home/work/project/darknet/data/dog.jpg
+    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/project/darknet/data/dog.jpg
 
     ps aux | grep api_object_detect.py |grep -v grep| cut -c 9-15 | xargs kill -9
 Author: yanjingang(yanjingang@mail.com)
@@ -90,7 +90,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
 
 if __name__ == '__main__':
     """服务入口"""
-    port = 8025
+    port = 8026
 
     # log init
     log_file = ApiObjectDetect.__name__.lower()  # + '-' + str(os.getpid())
