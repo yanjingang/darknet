@@ -5,6 +5,7 @@
 *.png
 *.jpg
 *.pyc
+log/
 old/
 mnist/
 data/

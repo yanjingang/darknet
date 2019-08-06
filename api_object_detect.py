@@ -27,7 +27,7 @@ from dp import utils
 import darknet
 
 
-# darknet init
+# darknet目标检测模型tiny版初始化
 _cfg = str.encode(APP_PATH+"/cfg/yolov3-tiny.cfg")
 _model = str.encode(APP_PATH+"/yolov3-tiny.weights")
 _meta = str.encode(APP_PATH+"/cfg/coco.data")
@@ -70,11 +70,13 @@ class ApiObjectDetect(tornado.web.RequestHandler):
         res = []
 
         try:
+            # 图像目标检测
             ret = darknet.detect(net, meta, str.encode(img_file))
             #print(ret)
             if not ret:
                 logging.error('execute fail [' + img_file + '] ')
                 return {'code': 4, 'msg': '查询失败'}
+            # 数据格式化
             for o in ret:
                 res.append({'label': str(o[0], 'utf-8'), 'weight': o[1], 'rect': o[2]})
             #print(res)
