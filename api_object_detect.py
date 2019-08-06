@@ -14,6 +14,7 @@ Date: 2019/8/2 23:08
 
 import sys
 import os
+import cv2
 import json
 import logging
 import tornado.ioloop
@@ -85,12 +86,14 @@ class ApiObjectDetect(tornado.web.RequestHandler):
             #ret = darknet.detect(net, meta, str.encode(img_file))
             res = darknet.detect(img_file)
             print(res)
-            #if not res:
-            #    logging.error('execute fail [' + img_file + '] ')
-            #    return {'code': 4, 'msg': 'detect fail'}
-            # 数据格式化
-            #for o in ret:
-            #    res.append({'label': str(o[0], 'utf-8'), 'weight': o[1], 'rect': o[2]})
+            # 标注位置
+            if len(res) > 0:
+                image = cv2.imread(img_file)
+                for obj in res:
+                    left, right, top, bottom = obj['rect']
+                    cv2.rectangle(image, (left, top), (right, bottom), (0, 255, 0), 2)
+                    cv2.putText(image, '{} {}'.format(obj['label'], round(obj['weight'], 2)), (left + 6, top + 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1)
+                cv2.imwrite(img_file, image)
             #print(res)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
