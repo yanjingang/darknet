@@ -24,15 +24,26 @@ import tornado.httpserver
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(APP_PATH+'/python/')
 from dp import utils
-import darknet
+from dp.darknet import Darknet
+#import darknet
 
 
 # darknet目标检测模型tiny版初始化
+darknet = Darknet(
+        so_file=APP_PATH + '/libdarknet.so',
+        #cfg_file=APP_PATH + '/cfg/yolov3.cfg',
+        #model_file=APP_PATH + '/yolov3.weights',
+        cfg_file=APP_PATH + '/cfg/yolov3-tiny.cfg',  # tiny低性能版
+        model_file=APP_PATH + '/yolov3-tiny.weights',
+        meta_file=APP_PATH + '/cfg/coco.data',  # 如果命令不在darknet目录执行时，需要把coco.data里的“names = data/coco.names”改为绝对路径
+    )
+'''
 _cfg = str.encode(APP_PATH+"/cfg/yolov3-tiny.cfg")
 _model = str.encode(APP_PATH+"/yolov3-tiny.weights")
 _meta = str.encode(APP_PATH+"/cfg/coco.data")
 net = darknet.load_net(_cfg, _model, 0)
 meta = darknet.load_meta(_meta)
+'''
 
 
 class ApiObjectDetect(tornado.web.RequestHandler):
@@ -71,14 +82,15 @@ class ApiObjectDetect(tornado.web.RequestHandler):
 
         try:
             # 图像目标检测
-            ret = darknet.detect(net, meta, str.encode(img_file))
+            #ret = darknet.detect(net, meta, str.encode(img_file))
+            res = darknet.detect(img_file)
             #print(ret)
-            if not ret:
+            if not res:
                 logging.error('execute fail [' + img_file + '] ')
                 return {'code': 4, 'msg': '查询失败'}
             # 数据格式化
-            for o in ret:
-                res.append({'label': str(o[0], 'utf-8'), 'weight': o[1], 'rect': o[2]})
+            #for o in ret:
+            #    res.append({'label': str(o[0], 'utf-8'), 'weight': o[1], 'rect': o[2]})
             #print(res)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
