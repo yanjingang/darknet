@@ -82,19 +82,22 @@ class ApiObjectDetect(tornado.web.RequestHandler):
         if img_file == '':
             return {'code': 2, 'msg': 'img_file不能为空'}
         res = []
+        caption = ''
 
         try:
             # 图像目标检测
             #ret = darknet.detect(net, meta, str.encode(img_file))
             res = darknet.detect(img_file, tag=tag_img) #tag：是否在图片上标记目标位置
             #print(res)
+            # 图像描述
+            caption = darknet.caption(res, thresh=0.55)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
             return {'code': 5, 'msg': 'detect fail'}
 
         # 组织返回格式
         url = img_file.replace('/home/work/odp/webroot/yanjingang/www/piglab/', 'http://www.yanjingang.com/piglab/')
-        return {'code': 0, 'msg': 'success', 'url':url, 'data': res}
+        return {'code': 0, 'msg': 'success', 'data': {'url': url, 'objects': res, 'caption': caption}}
 
 
 if __name__ == '__main__':

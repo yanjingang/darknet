@@ -8,7 +8,7 @@
 log/
 old/
 mnist/
-data/
+#data/
 caffe/
 grasp/
 images/
@@ -16,7 +16,7 @@ opencv/
 convnet/
 decaf/
 submission/
-cfg/
+#cfg/
 darknet
 .fuse*
 
