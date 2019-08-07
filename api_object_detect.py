@@ -6,7 +6,7 @@ Desc: 图像目标识别 API 封装
 Demo: 
     nohup python api_object_detect.py > log/api_object_detect.log &
     http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/project/darknet/data/dog.jpg&tag_img=0
-    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/odp/webroot/yanjingang/www/piglab/upload/190807/156514705124.jpg&tag_img=0
+    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/odp/webroot/yanjingang/www/piglab/upload/190807/1565170604787.jpeg&tag_img=0
 
     ps aux | grep api_object_detect.py |grep -v grep| cut -c 9-15 | xargs kill -9
 Author: yanjingang(yanjingang@mail.com)
@@ -90,7 +90,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
             res = darknet.detect(img_file, tag=tag_img) #tag：是否在图片上标记目标位置
             #print(res)
             # 图像描述
-            caption = darknet.caption(res, thresh=0.55)
+            caption = darknet.caption(res)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
             return {'code': 5, 'msg': 'detect fail'}
