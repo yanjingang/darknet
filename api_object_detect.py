@@ -77,6 +77,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
         logging.info('API REQUEST INFO[' + self.request.path + '][' + self.request.method + ']['
                       + self.request.remote_ip + '][' + str(self.request.arguments) + ']')
         img_file = self.get_argument('img_file', '')
+        tag_img = int(self.get_argument('tag_img', 0))
         if img_file == '':
             return {'code': 2, 'msg': 'img_file不能为空'}
         res = []
@@ -84,10 +85,10 @@ class ApiObjectDetect(tornado.web.RequestHandler):
         try:
             # 图像目标检测
             #ret = darknet.detect(net, meta, str.encode(img_file))
-            res = darknet.detect(img_file)
-            print(res)
-            # 标注位置
-            if len(res) > 0:
+            res = darknet.detect(img_file, tag=tag_img) #tag：是否在图片上标记目标位置
+            #print(res)
+            # 标注位置(待小程序增加tag发版后删除)
+            if not tag_img and len(res) > 0:
                 image = cv2.imread(img_file)
                 for obj in res:
                     left, right, top, bottom = obj['rect']
