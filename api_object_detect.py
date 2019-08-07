@@ -58,7 +58,7 @@ profile = {
     'per': 4,  # 发音人选择 0：女生；1：男生；3：度逍遥；4：度丫丫
     'lan': 'zh',
 }
-_tts = tts.get_engine('baidu-tts', profile, cache_path=IMG_PATH + '/tts/')
+_tts = tts.get_engine('baidu-tts', profile, cache_path=IMG_PATH + '/upload/tts/')
 
 
 class ApiObjectDetect(tornado.web.RequestHandler):
