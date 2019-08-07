@@ -5,8 +5,8 @@ File: api_object_detect.py
 Desc: 图像目标识别 API 封装
 Demo: 
     nohup python api_object_detect.py > log/api_object_detect.log &
-    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/project/darknet/data/dog.jpg&tag_img=0
-    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/odp/webroot/yanjingang/www/piglab/upload/190807/1565170604787.jpeg&tag_img=0
+    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/project/darknet/data/dog.jpg&tag_img=0&tts_caption=pos
+    http://www.yanjingang.com:8026/piglab/image/object_detect?img_file=/home/work/odp/webroot/yanjingang/www/piglab/upload/190807/1565170604787.jpeg&tag_img=0&tts_caption=pos
 
     ps aux | grep api_object_detect.py |grep -v grep| cut -c 9-15 | xargs kill -9
 Author: yanjingang(yanjingang@mail.com)
@@ -25,12 +25,14 @@ import tornado.httpserver
 # PATH
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(APP_PATH+'/python/')
-from dp import utils
+from dp import utils,tts
 from dp.darknet import Darknet
 #import darknet
 
+IMG_PATH='/home/work/odp/webroot/yanjingang/www/piglab/'
+IMG_URL='http://www.yanjingang.com/piglab/'
 
-# darknet目标检测模型tiny版初始化
+# init darknet目标检测模型tiny版初始化
 darknet = Darknet(
         so_file=APP_PATH + '/libdarknet.so',
         #cfg_file=APP_PATH + '/cfg/yolov3.cfg',
@@ -46,6 +48,17 @@ _meta = str.encode(APP_PATH+"/cfg/coco.data")
 net = darknet.load_net(_cfg, _model, 0)
 meta = darknet.load_meta(_meta)
 '''
+
+# init tts
+# 初始化语音合成
+profile = {
+    'appid': '9670645',
+    'api_key': 'qg4haN8b2bGvFtCbBGqhrmZy',   # 请改为自己的百度语音APP的API Key
+    'secret_key': '585d4eccb50d306c401d7df138bb02e7',
+    'per': 4,  # 发音人选择 0：女生；1：男生；3：度逍遥；4：度丫丫
+    'lan': 'zh',
+}
+_tts = tts.get_engine('baidu-tts', profile, cache_path=IMG_PATH + '/tts/')
 
 
 class ApiObjectDetect(tornado.web.RequestHandler):
@@ -79,6 +92,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
                       + self.request.remote_ip + '][' + str(self.request.arguments) + ']')
         img_file = self.get_argument('img_file', '')
         tag_img = int(self.get_argument('tag_img', 0))
+        tts_caption = self.get_argument('tts_caption', '')
         if img_file == '':
             return {'code': 2, 'msg': 'img_file不能为空'}
         res = []
@@ -91,13 +105,25 @@ class ApiObjectDetect(tornado.web.RequestHandler):
             #print(res)
             # 图像描述
             caption = darknet.caption(res)
+            # 图像描述语音合成
+            tts_url = ''
+            if tts_caption:
+                s = caption[tts_caption]
+                voice_file = _tts._get_cache(s)
+                if not voice_file:
+                    voice_file = _tts.get_speech(s)
+                    cache_file = _tts._set_cache(s, voice_file)
+                    if cache_file:
+                        voice_file = cache_file
+                    
+                tts_url = voice_file.replace(IMG_PATH, IMG_URL)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
             return {'code': 5, 'msg': 'detect fail'}
 
         # 组织返回格式
-        url = img_file.replace('/home/work/odp/webroot/yanjingang/www/piglab/', 'http://www.yanjingang.com/piglab/')
-        return {'code': 0, 'msg': 'success', 'data': {'url': url, 'objects': res, 'caption': caption}}
+        url = img_file.replace(IMG_PATH, IMG_URL)
+        return {'code': 0, 'msg': 'success', 'data': {'url': url, 'objects': res, 'caption': caption, 'tts_caption': tts_url}}
 
 
 if __name__ == '__main__':
