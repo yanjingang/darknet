@@ -32,7 +32,7 @@ from dp.darknet import Darknet
 IMG_PATH='/home/work/odp/webroot/yanjingang/www/piglab/'
 IMG_URL='http://www.yanjingang.com/piglab/'
 
-# init darknet目标检测模型tiny版初始化
+# init darknet目标检测模型tiny版
 darknet = Darknet(
         so_file=APP_PATH + '/libdarknet.so',
         #cfg_file=APP_PATH + '/cfg/yolov3.cfg',
@@ -41,16 +41,8 @@ darknet = Darknet(
         model_file=APP_PATH + '/yolov3-tiny.weights',
         meta_file=APP_PATH + '/cfg/coco.data',  # 如果命令不在darknet目录执行时，需要把coco.data里的“names = data/coco.names”改为绝对路径
     )
-'''
-_cfg = str.encode(APP_PATH+"/cfg/yolov3-tiny.cfg")
-_model = str.encode(APP_PATH+"/yolov3-tiny.weights")
-_meta = str.encode(APP_PATH+"/cfg/coco.data")
-net = darknet.load_net(_cfg, _model, 0)
-meta = darknet.load_meta(_meta)
-'''
 
-# init tts
-# 初始化语音合成
+# init tts语音合成
 profile = {
     'appid': '9670645',
     'api_key': 'qg4haN8b2bGvFtCbBGqhrmZy',   # 请改为自己的百度语音APP的API Key
@@ -91,8 +83,9 @@ class ApiObjectDetect(tornado.web.RequestHandler):
         logging.info('API REQUEST INFO[' + self.request.path + '][' + self.request.method + ']['
                       + self.request.remote_ip + '][' + str(self.request.arguments) + ']')
         img_file = self.get_argument('img_file', '')
-        tag_img = int(self.get_argument('tag_img', 0))
-        tts_caption = self.get_argument('tts_caption', '')
+        tag_img = int(self.get_argument('tag_img', 0))  # 是否在图片上标记目标位置
+        detect_face = int(self.get_argument('detect_face', 0)) # 是否识别人脸
+        tts_caption = self.get_argument('tts_caption', '') # 是否为图像描述合成语音
         if img_file == '':
             return {'code': 2, 'msg': 'img_file不能为空'}
         res = []
@@ -100,8 +93,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
 
         try:
             # 图像目标检测
-            #ret = darknet.detect(net, meta, str.encode(img_file))
-            res = darknet.detect(img_file, tag=tag_img) #tag：是否在图片上标记目标位置
+            res = darknet.detect(img_file, tag_img=tag_img, detect_face=detect_face)
             #print(res)
             # 图像描述
             caption = darknet.caption(res)
