@@ -40,6 +40,7 @@ darknet = Darknet(
         cfg_file=APP_PATH + '/cfg/yolov3-tiny.cfg',  # tiny低性能版
         model_file=APP_PATH + '/yolov3-tiny.weights',
         meta_file=APP_PATH + '/cfg/coco.data',  # 如果命令不在darknet目录执行时，需要把coco.data里的“names = data/coco.names”改为绝对路径
+        faceid_path='/home/work/project/pigface/data/facedb/faceid/',
     )
 
 # init tts语音合成
