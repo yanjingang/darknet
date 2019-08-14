@@ -88,7 +88,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
         detect_face = int(self.get_argument('detect_face', 0)) # 是否识别人脸
         tts_caption = self.get_argument('tts_caption', '') # 是否为图像描述合成语音
         if img_file == '':
-            return {'code': 2, 'msg': 'img_file不能为空'}
+            return {'code': 2, 'msg': 'img_file不能为空', 'data': {}}
         res = []
         caption = ''
 
@@ -112,7 +112,7 @@ class ApiObjectDetect(tornado.web.RequestHandler):
                 tts_url = voice_file.replace(IMG_PATH, IMG_URL)
         except:
             logging.error('execute fail [' + img_file + '] ' + utils.get_trace())
-            return {'code': 5, 'msg': 'detect fail'}
+            return {'code': 5, 'msg': 'detect fail', 'data': {}}
 
         # 组织返回格式
         url = img_file.replace(IMG_PATH, IMG_URL)
